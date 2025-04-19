@@ -2,152 +2,166 @@ import requests
 import logging
 import time
 from typing import Dict, Optional, List
+import pandas as pd # Import pandas
 
-# --- Importar la función de parseo ---
-from parser import parse_lc_data # Asegúrate que parser.py esté en src/
+# --- Import parsing function ---
+from parser import parse_lc_data # Make sure parser.py is in src/
 
-# Asumiendo que config.py existirá en el mismo directorio (src)
+# Assuming config.py will exist in the same directory (src)
 # from .config import BASE_URL, DEFAULT_VIEW_SUFFIX, HEADERS, REQUEST_DELAY_SECONDS
 
-# Configuración básica de logging (puede moverse a config.py o inicializarse en main.py)
+# Basic logging configuration (can be moved to config.py or initialized in main.py)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 class AIESECScraper:
     """
-    Clase principal para manejar el scraping del dashboard de AIESEC.
+    Main class to handle scraping the AIESEC dashboard.
 
-    Gestiona la sesión de requests, realiza peticiones a las páginas de análisis
-    de cada país y coordina la extracción de datos llamando al parser.
+    Manages the requests session, sends requests to the analysis pages
+    for each country, and coordinates data extraction by calling the parser.
     """
 
     def __init__(self):
         """
-        Inicializa el scraper creando una sesión de requests persistente
-        y cargando la configuración necesaria.
+        Initializes the scraper by creating a persistent requests session
+        and loading necessary configurations.
         """
         self.session = requests.Session()
-        # Cargar configuración directamente (o desde config.py)
-        self.base_url = "https://core.aiesec.org.eg/analytics/"
-        self.view_suffix = "/LC25/"
-        self.delay = 2 # O cargar desde config.py: from .config import REQUEST_DELAY_SECONDS
-        default_user_agent = 'MyAIESECDataScraper/1.0 (Contact: your_email@example.com)' # O desde config.py
+        # Load configuration directly (or from config.py)
+        from config import BASE_URL, DEFAULT_VIEW_SUFFIX, REQUEST_DELAY_SECONDS, HEADERS
+        self.base_url = BASE_URL
+        self.view_suffix = DEFAULT_VIEW_SUFFIX
+        self.delay = REQUEST_DELAY_SECONDS
+        self.session.headers.update(HEADERS)
 
-        self.session.headers.update({
-            # Cargar User-Agent (o desde config.py: from .config import HEADERS)
-            'User-Agent': default_user_agent
-        })
-
-        logging.info("Scraper inicializado con una nueva sesión y configuración.")
+        logging.info("Scraper initialized with a new session and configuration.")
 
     def fetch_country_page(self, country_id: int) -> Optional[str]:
         """
-        Obtiene el contenido HTML de la página de análisis para un país dado.
+        Fetches the HTML content of the analysis page for a given country.
 
         Args:
-            country_id: El ID numérico del país a scrapear.
+            country_id: The numeric ID of the country to scrape.
 
         Returns:
-            El contenido HTML de la página como string si la petición es exitosa,
-            None en caso de error de red.
+            The HTML content of the page as a string if the request is successful,
+            None in case of a network error.
         """
-        country_url = f"{self.base_url}{country_id}{self.view_suffix}"
-        logging.info(f"Accediendo a: {country_url}")
+        # Construct URL making sure there are no double slashes
+        country_url = f"{self.base_url.rstrip('/')}/{country_id}/{self.view_suffix.lstrip('/')}"
+        logging.info(f"Accessing: {country_url}")
         try:
-            response = self.session.get(country_url, timeout=20)
-            response.raise_for_status()
-            
-            logging.debug(f"Petición exitosa para Country ID {country_id}. Tamaño: {len(response.content)} bytes.")
+            response = self.session.get(country_url, timeout=20) # Increased timeout just in case
+            response.raise_for_status() # Check for HTTP errors (4xx or 5xx)
+
+            logging.debug(f"Successful request for Country ID {country_id}. Size: {len(response.content)} bytes.")
+            # Return content as text for BeautifulSoup
             return response.text
         except requests.exceptions.RequestException as e:
-            logging.error(f"Error en la petición para Country ID {country_id}: {e}")
+            logging.error(f"Request error for Country ID {country_id}: {e}")
             return None
         except Exception as e:
-            logging.error(f"Error inesperado durante la petición para Country ID {country_id}: {e}")
+            # Generic catch for other potential request-time errors
+            logging.error(f"Unexpected error during request for Country ID {country_id}: {e}")
             return None
 
-    def run_scraper(self, country_codes_dict: Dict[int, str]) -> List[Dict]:
+    def run_scraper(self, country_codes_dict: Dict[int, str]) -> pd.DataFrame:
         """
-        Orquesta el proceso completo de scraping para la lista de países dada.
+        Orchestrates the entire scraping process for the given list of countries.
 
-        Itera sobre el diccionario de países, obtiene el HTML de cada uno,
-        llama a la función de parseo (a implementar en parser.py) y
-        acumula los resultados.
+        Iterates over the country dictionary, fetches the HTML for each,
+        calls the parsing function (from parser.py), and concatenates the results
+        into a single DataFrame.
 
         Args:
-            country_codes_dict: Diccionario {country_id: country_name}.
+            country_codes_dict: Dictionary {country_id: country_name}.
 
         Returns:
-            Una lista de diccionarios, donde cada diccionario representa los datos
-            extraídos para un LC (Local Committee).
+            A pandas DataFrame containing the combined extracted data for all LCs
+            from all successfully scraped countries.
         """
-        all_extracted_data: List[Dict] = []
+        # Initialize an empty DataFrame to store all results
+        all_extracted_data_df = pd.DataFrame()
         total_countries = len(country_codes_dict)
-        logging.info(f"Iniciando scraping para {total_countries} países...")
+        logging.info(f"Starting scraping for {total_countries} countries...")
 
         for i, (country_id, country_name) in enumerate(country_codes_dict.items()):
-            logging.info(f"Procesando País {i+1}/{total_countries}: ID={country_id}, Nombre='{country_name}'")
+            logging.info(f"Processing Country {i+1}/{total_countries}: ID={country_id}, Name='{country_name}'")
 
-            # 1. Obtener el HTML
+            # 1. Fetch HTML
             html_content = self.fetch_country_page(country_id)
 
             if html_content:
-                # 2. Parsear el HTML llamando a la función externa
+                # 2. Parse HTML by calling the external function
                 try:
-                    # --- LLAMADA REAL A LA FUNCIÓN DE PARSEO ---
-                    parsed_data = parse_lc_data(html_content, country_id, country_name)
-                    # --- FIN DE LA LLAMADA ---
+                    # --- ACTUAL CALL TO THE PARSING FUNCTION ---
+                    # Expecting a DataFrame from parse_lc_data now
+                    parsed_df = parse_lc_data(html_content, country_id, country_name)
+                    # --- END OF CALL ---
 
-                    if parsed_data:
-                        logging.info(f"Parseo exitoso para {country_id}. Se encontraron {len(parsed_data)} registros de LC.")
-                        all_extracted_data.extend(parsed_data)
+                    # Check if the parser returned a valid, non-empty DataFrame
+                    if isinstance(parsed_df, pd.DataFrame) and not parsed_df.empty:
+                        num_rows = len(parsed_df)
+                        logging.info(f"Parsing successful for {country_id}. Found {num_rows} LCs.")
+                        # Concatenate the new DataFrame to the main one
+                        all_extracted_data_df = pd.concat([all_extracted_data_df, parsed_df], ignore_index=True)
+                        #logging.info(all_extracted_data_df)
+                    elif isinstance(parsed_df, pd.DataFrame) and parsed_df.empty:
+                        logging.warning(f"Parsing returned an empty DataFrame for {country_id} ('{country_name}').")
                     else:
-                        # Esto puede ser normal si un país no tiene LCs o si el parseo no encuentra nada con los selectores actuales
-                        logging.warning(f"El parseo no devolvió datos de LC válidos para {country_id} ('{country_name}').")
+                         # Handle cases where parser might not return a DataFrame as expected
+                         logging.error(f"Parsing function did not return a DataFrame for {country_id} ('{country_name}'). Type received: {type(parsed_df)}")
 
                 except Exception as e:
-                    # Capturar errores durante la llamada al parseo (inesperado si parse_lc_data maneja sus propios errores)
-                    logging.error(f"Error inesperado al llamar a la función de parseo para {country_id} ('{country_name}'): {e}", exc_info=True)
+                    logging.error(f"Unexpected error calling parsing function for {country_id} ('{country_name}'): {e}", exc_info=True)
 
             else:
-                logging.warning(f"No se pudo obtener el HTML para {country_id} ('{country_name}'). Saltando país.")
+                logging.warning(f"Could not fetch HTML for {country_id} ('{country_name}'). Skipping country.")
 
-            # 3. Esperar antes de la siguiente petición
+            # 3. Wait before the next request
             if i < total_countries - 1:
-                 logging.debug(f"Esperando {self.delay} segundos antes del siguiente país...")
+                 logging.debug(f"Waiting {self.delay} seconds before next country...")
                  time.sleep(self.delay)
 
-        logging.info(f"Scraping completado. Se extrajeron datos de {len(all_extracted_data)} LCs en total (basado en la lógica de parseo actual).")
-        return all_extracted_data
+        # Log final summary with total rows collected
+        total_rows_collected = len(all_extracted_data_df)
+        logging.info(f"Scraping completed. Extracted data for {total_rows_collected} total rows across all countries.")
+        return all_extracted_data_df
 
     def close_session(self):
-        """Cierra la sesión de requests."""
+        """Closes the requests session."""
         if self.session:
             self.session.close()
-            logging.info("Sesión de requests cerrada.")
+            logging.info("Requests session closed.")
 
-# --- Ejemplo de cómo se usaría desde main.py (quitar o mover a tests) ---
+# --- Example of how it would be used from main.py (remove or move to tests) ---
 # if __name__ == "__main__":
-#     # Esto simularía la ejecución desde main.py
-#     from utils import get_country_codes_dict_from_csv # Asumiendo que utils está en el mismo nivel
+#     # This would simulate running from main.py
+#     from utils import get_country_codes_dict_from_csv # Assuming utils is at the same level
 #
-#     # Crear directorio y archivo dummy si no existen para prueba
+#     # Create dummy directory and file if they don't exist for testing
 #     test_file_path = '../data/codigos.csv'
+#     # Ensure the dummy data creation uses the expected column names if changed in utils.py
+#     dummy_csv_data = {'ID': [1566, 572], 'NombrePais': ['Chile', 'Afghanistan']} # Example data
 #     if not os.path.exists(os.path.dirname(test_file_path)):
 #         os.makedirs(os.path.dirname(test_file_path))
 #     if not os.path.exists(test_file_path):
-#         dummy_df = pd.DataFrame({'ID': [1566, 572], 'NombrePais': ['Chile', 'Afghanistan']}) # Ejemplo simple
-#         dummy_df.to_csv(test_file_path, index=False)
-#         print(f"Archivo dummy creado en {test_file_path}")
+#         import pandas as pd # Need pandas here for dummy creation
+#         dummy_df = pd.DataFrame(dummy_csv_data)
+#         dummy_df.to_csv(test_file_path, index=False, sep=';') # Match separator used in utils
+#         print(f"Dummy file created at {test_file_path}")
 #
-#     country_codes = get_country_codes_dict_from_csv(test_file_path)
+#     # Load codes using the function from utils
+#     # Make sure name_col matches the one expected by get_country_codes_dict_from_csv
+#     country_codes = get_country_codes_dict_from_csv(test_file_path, name_col='NombrePais')
 #
 #     if country_codes:
 #         scraper_instance = AIESECScraper()
-#         # Aquí faltaría la implementación real del parser
-#         # Por ahora, run_scraper devolverá una lista vacía porque el parseo es un placeholder
+#         # The actual parser implementation is missing here
+#         # For now, run_scraper will return an empty DataFrame because parsing is a placeholder
 #         results = scraper_instance.run_scraper(country_codes)
-#         print(f"\nResultados del scraping (simulado): {len(results)} LCs encontrados.")
-#         # print(results) # Descomentar para ver la lista vacía
+#         print(f"\nScraping results (simulated): {len(results)} LCs found.")
+#         # print(results) # Uncomment to see the empty DataFrame
 #         scraper_instance.close_session()
 #     else:
-#         print("No se pudieron cargar los códigos de país para probar el scraper.")
+#         print("Could not load country codes to test the scraper.")

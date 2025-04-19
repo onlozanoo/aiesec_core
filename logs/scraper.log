@@ -1,0 +1,124 @@
+2025-04-18 20:19:41,776 - INFO - main - Logging to console and file: f:\Documentos\Proyectos DS\Scraper_Coops\logs\scraper.log
+2025-04-18 20:19:41,777 - INFO - main - --- Starting Main Scraper Execution ---
+2025-04-18 20:19:41,777 - INFO - main - Loading country codes from: f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:19:41,777 - INFO - utils - Attempting to read country codes from: f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:19:41,781 - INFO - utils - Successfully loaded 7 country codes from f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv.
+2025-04-18 20:19:41,781 - INFO - scraper - Scraper initialized with a new session and configuration.
+2025-04-18 20:19:41,781 - INFO - main - Starting the scraping process...
+2025-04-18 20:19:41,782 - INFO - scraper - Starting scraping for 7 countries...
+2025-04-18 20:19:41,782 - INFO - scraper - Processing Country 1/7: ID=572, Name='Afghanistan'
+2025-04-18 20:19:41,783 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/572/LC25/
+2025-04-18 20:19:42,457 - INFO - parser - Found 3 potential LC elements for 572 ('Afghanistan'). Processing...
+2025-04-18 20:19:42,457 - INFO - scraper - Parsing successful for 572. Found 3 LCs.
+2025-04-18 20:19:42,959 - INFO - scraper - Processing Country 2/7: ID=133, Name='Albania'
+2025-04-18 20:19:42,959 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/133/LC25/
+2025-04-18 20:19:43,482 - INFO - parser - Found 11 potential LC elements for 133 ('Albania'). Processing...
+2025-04-18 20:19:43,482 - INFO - scraper - Parsing successful for 133. Found 11 LCs.
+2025-04-18 20:19:43,984 - INFO - scraper - Processing Country 3/7: ID=457, Name='Algeria'
+2025-04-18 20:19:43,984 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/457/LC25/
+2025-04-18 20:19:44,533 - INFO - parser - Found 11 potential LC elements for 457 ('Algeria'). Processing...
+2025-04-18 20:19:44,533 - INFO - scraper - Parsing successful for 457. Found 11 LCs.
+2025-04-18 20:19:45,034 - INFO - scraper - Processing Country 4/7: ID=2249, Name='Andorra'
+2025-04-18 20:19:45,034 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/2249/LC25/
+2025-04-18 20:19:45,376 - INFO - parser - Found 1 potential LC elements for 2249 ('Andorra'). Processing...
+2025-04-18 20:19:45,376 - INFO - scraper - Parsing successful for 2249. Found 1 LCs.
+2025-04-18 20:19:45,878 - INFO - scraper - Processing Country 5/7: ID=1535, Name='Argentina'
+2025-04-18 20:19:45,878 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1535/LC25/
+2025-04-18 20:19:46,394 - INFO - parser - Found 9 potential LC elements for 1535 ('Argentina'). Processing...
+2025-04-18 20:19:46,394 - INFO - scraper - Parsing successful for 1535. Found 9 LCs.
+2025-04-18 20:19:46,896 - INFO - scraper - Processing Country 6/7: ID=1541, Name='Armenia'
+2025-04-18 20:19:46,896 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1541/LC25/
+2025-04-18 20:19:47,254 - INFO - parser - Found 1 potential LC elements for 1541 ('Armenia'). Processing...
+2025-04-18 20:19:47,255 - INFO - scraper - Parsing successful for 1541. Found 1 LCs.
+2025-04-18 20:19:47,756 - INFO - scraper - Processing Country 7/7: ID=1591, Name='Australia'
+2025-04-18 20:19:47,756 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1591/LC25/
+2025-04-18 20:19:48,631 - INFO - parser - Found 24 potential LC elements for 1591 ('Australia'). Processing...
+2025-04-18 20:19:48,631 - INFO - scraper - Parsing successful for 1591. Found 24 LCs.
+2025-04-18 20:19:48,631 - INFO - scraper - Scraping completed. Extracted data for 60 total rows across all countries.
+2025-04-18 20:19:48,632 - INFO - main - Scraping finished. Received DataFrame with 60 rows.
+2025-04-18 20:19:48,632 - INFO - scraper - Requests session closed.
+2025-04-18 20:19:48,632 - INFO - main - Proceeding to data cleaning/processing step (Placeholder)...
+2025-04-18 20:19:48,632 - INFO - main - Data cleaning/processing finished (Placeholder).
+2025-04-18 20:19:48,633 - INFO - main - Saving final DataFrame to: f:\Documentos\Proyectos DS\Scraper_Coops\data\aiesec_lc_data_output.csv
+2025-04-18 20:19:48,650 - INFO - main - Successfully saved data to f:\Documentos\Proyectos DS\Scraper_Coops\data\aiesec_lc_data_output.csv
+2025-04-18 20:19:48,650 - INFO - main - --- Main Scraper Execution Finished ---
+2025-04-18 20:41:37,259 - INFO - main - Logging to console and file: f:\Documentos\Proyectos DS\Scraper_Coops\logs\scraper.log
+2025-04-18 20:41:37,260 - INFO - main - --- Starting Main Scraper Execution ---
+2025-04-18 20:41:37,260 - INFO - main - Loading country codes from: f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:41:37,260 - INFO - utils - Attempting to read country codes from: f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:41:37,266 - INFO - utils - Successfully loaded 7 country codes from f:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv.
+2025-04-18 20:41:37,266 - INFO - scraper - Scraper initialized with a new session and configuration.
+2025-04-18 20:41:37,267 - INFO - main - Starting the scraping process...
+2025-04-18 20:41:37,268 - INFO - scraper - Starting scraping for 7 countries...
+2025-04-18 20:41:37,268 - INFO - scraper - Processing Country 1/7: ID=572, Name='Afghanistan'
+2025-04-18 20:41:37,269 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/572/LC25/
+2025-04-18 20:41:37,942 - INFO - parser - Found 3 potential LC elements for 572 ('Afghanistan'). Processing...
+2025-04-18 20:41:37,943 - INFO - scraper - Parsing successful for 572. Found 3 LCs.
+2025-04-18 20:41:38,445 - INFO - scraper - Processing Country 2/7: ID=133, Name='Albania'
+2025-04-18 20:41:38,445 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/133/LC25/
+2025-04-18 20:41:39,124 - INFO - parser - Found 11 potential LC elements for 133 ('Albania'). Processing...
+2025-04-18 20:41:39,125 - INFO - scraper - Parsing successful for 133. Found 11 LCs.
+2025-04-18 20:41:39,626 - INFO - scraper - Processing Country 3/7: ID=457, Name='Algeria'
+2025-04-18 20:41:39,626 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/457/LC25/
+2025-04-18 20:41:40,188 - INFO - parser - Found 11 potential LC elements for 457 ('Algeria'). Processing...
+2025-04-18 20:41:40,188 - INFO - scraper - Parsing successful for 457. Found 11 LCs.
+2025-04-18 20:41:40,689 - INFO - scraper - Processing Country 4/7: ID=2249, Name='Andorra'
+2025-04-18 20:41:40,689 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/2249/LC25/
+2025-04-18 20:41:41,027 - INFO - parser - Found 1 potential LC elements for 2249 ('Andorra'). Processing...
+2025-04-18 20:41:41,027 - INFO - scraper - Parsing successful for 2249. Found 1 LCs.
+2025-04-18 20:41:41,528 - INFO - scraper - Processing Country 5/7: ID=1535, Name='Argentina'
+2025-04-18 20:41:41,528 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1535/LC25/
+2025-04-18 20:41:42,080 - INFO - parser - Found 9 potential LC elements for 1535 ('Argentina'). Processing...
+2025-04-18 20:41:42,080 - INFO - scraper - Parsing successful for 1535. Found 9 LCs.
+2025-04-18 20:41:42,581 - INFO - scraper - Processing Country 6/7: ID=1541, Name='Armenia'
+2025-04-18 20:41:42,581 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1541/LC25/
+2025-04-18 20:41:42,983 - INFO - parser - Found 1 potential LC elements for 1541 ('Armenia'). Processing...
+2025-04-18 20:41:42,984 - INFO - scraper - Parsing successful for 1541. Found 1 LCs.
+2025-04-18 20:41:43,486 - INFO - scraper - Processing Country 7/7: ID=1591, Name='Australia'
+2025-04-18 20:41:43,486 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/1591/LC25/
+2025-04-18 20:41:44,263 - INFO - parser - Found 24 potential LC elements for 1591 ('Australia'). Processing...
+2025-04-18 20:41:44,264 - INFO - scraper - Parsing successful for 1591. Found 24 LCs.
+2025-04-18 20:41:44,264 - INFO - scraper - Scraping completed. Extracted data for 60 total rows across all countries.
+2025-04-18 20:41:44,265 - INFO - main - Scraping finished. Received DataFrame with 60 rows.
+2025-04-18 20:41:44,265 - INFO - scraper - Requests session closed.
+2025-04-18 20:41:44,265 - INFO - main - Proceeding to data cleaning/processing step
+2025-04-18 20:41:44,266 - ERROR - main - An error occurred during data processing: 'Date'
+Traceback (most recent call last):
+  File "F:\Documentos\Proyectos DS\Scraper_Coops\venv_scraper_coops\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'Date'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "f:\Documentos\Proyectos DS\Scraper_Coops\main.py", line 101, in run_main_scraper
+    cleaned_df = process_data(raw_data_df) # Call cleaning function when implemented
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "f:\Documentos\Proyectos DS\Scraper_Coops\src\processing.py", line 9, in process_data
+    df['Date'] = pd.to_datetime(df['Date'])
+                                ~~^^^^^^^^
+  File "F:\Documentos\Proyectos DS\Scraper_Coops\venv_scraper_coops\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Documentos\Proyectos DS\Scraper_Coops\venv_scraper_coops\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'Date'
+2025-04-18 20:41:44,325 - WARNING - main - Using raw data due to processing error.
+2025-04-18 20:41:44,326 - INFO - main - Saving final DataFrame to: f:\Documentos\Proyectos DS\Scraper_Coops\data\aiesec_lc_data_output.csv
+2025-04-18 20:41:44,329 - INFO - main - Successfully saved data to f:\Documentos\Proyectos DS\Scraper_Coops\data\aiesec_lc_data_output.csv
+2025-04-18 20:41:44,329 - INFO - main - --- Main Scraper Execution Finished ---
+2025-04-18 20:42:27,447 - INFO - main - Logging to console and file: F:\Documentos\Proyectos DS\Scraper_Coops\logs\scraper.log
+2025-04-18 20:42:27,448 - INFO - main - --- Starting Main Scraper Execution ---
+2025-04-18 20:42:27,449 - INFO - main - Loading country codes from: F:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:42:27,449 - INFO - utils - Attempting to read country codes from: F:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv
+2025-04-18 20:42:27,457 - INFO - utils - Successfully loaded 7 country codes from F:\Documentos\Proyectos DS\Scraper_Coops\data\codigos.csv.
+2025-04-18 20:42:27,458 - INFO - scraper - Scraper initialized with a new session and configuration.
+2025-04-18 20:42:27,458 - INFO - main - Starting the scraping process...
+2025-04-18 20:42:27,459 - INFO - scraper - Starting scraping for 7 countries...
+2025-04-18 20:42:27,459 - INFO - scraper - Processing Country 1/7: ID=572, Name='Afghanistan'
+2025-04-18 20:42:27,460 - INFO - scraper - Accessing: https://core.aiesec.org.eg/analytics/572/LC25/

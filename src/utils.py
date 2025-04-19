@@ -1,96 +1,107 @@
 import pandas as pd
 import logging
 import os
-from typing import Dict, Optional # Para type hints
+from typing import Dict, Optional # For type hints
+from config import COUNTRY_ID_COLUMN, COUNTRY_NAME_COLUMN
 
-# Configuración básica de logging (puedes moverla a config.py o main.py si prefieres centralizarla)
+# Basic logging configuration (can be moved to config.py or main.py for centralization)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def get_country_codes_dict_from_csv(
     filepath: str,
-    id_col: str = 'ID',
-    name_col: str = 'NombrePais'
+    id_col: str = 'Country_ID',
+    name_col: str = 'Country_Name'
 ) -> Dict[int, str]:
     """
-    Lee los IDs y nombres de países desde un archivo CSV y los devuelve como un diccionario.
+    Reads country IDs and names from a CSV file and returns them as a dictionary.
 
     Args:
-        filepath: Ruta al archivo CSV.
-        id_col: Nombre de la columna que contiene los IDs numéricos de país.
-        name_col: Nombre de la columna que contiene los nombres de los países.
+        filepath: Path to the CSV file.
+        id_col: Name of the column containing the numeric country IDs.
+        name_col: Name of the column containing the country names.
 
     Returns:
-        Un diccionario donde las claves son los IDs de país (int) y los valores
-        son los nombres de país (str). Devuelve un diccionario vacío si ocurre un error.
+        A dictionary where keys are country IDs (int) and values
+        are country names (str). Returns an empty dictionary if an error occurs.
     """
-    logging.info(f"Intentando leer códigos de país desde: {filepath}")
+    logging.info(f"Attempting to read country codes from: {filepath}")
     country_codes_dict: Dict[int, str] = {}
 
     try:
-        # 1. Verificar si el archivo existe
+        # 1. Check if the file exists
         if not os.path.exists(filepath):
-            logging.error(f"El archivo de códigos no existe en la ruta: {filepath}")
-            return country_codes_dict # Devuelve diccionario vacío
+            logging.error(f"Codes file does not exist at path: {filepath}")
+            return country_codes_dict # Return empty dictionary
 
-        # 2. Leer el archivo CSV usando pandas
-        df_codes = pd.read_csv(filepath, sep=';')
+        # 2. Read the CSV file using pandas
+        # Assuming the separator might be semicolon for some CSVs, adjust if needed
+        df_codes = pd.read_csv(filepath, sep=',') # Adjust separator if necessary
 
-        # 3. Verificar si las columnas requeridas existen
+        # 3. Check if the required columns exist
         if id_col not in df_codes.columns:
-            logging.error(f"La columna ID '{id_col}' no se encontró en {filepath}")
+            logging.error(f"ID column '{id_col}' not found in {filepath}")
             return country_codes_dict
         if name_col not in df_codes.columns:
-            # Advertencia si la columna de nombre no existe, pero aún podemos proceder con IDs
-            logging.warning(f"La columna de nombre '{name_col}' no se encontró en {filepath}. Se usarán solo IDs.")
-            # Podríamos decidir devolver solo una lista de IDs o un diccionario con valores None
-            # Por ahora, seguiremos intentando crear el diccionario, pero los nombres faltarán.
+            # Warning if the name column doesn't exist, but we can still proceed with IDs
+            logging.warning(f"Name column '{name_col}' not found in {filepath}. Will use IDs only as names.")
+            # We could decide to return only a list of IDs or a dict with None values
+            # For now, we'll continue trying to create the dictionary, but names will be missing/placeholders.
 
-        # 4. Crear el diccionario {ID: NombrePais}
+        # 4. Create the dictionary {ID: CountryName}
         for index, row in df_codes.iterrows():
             try:
-                # Intentar convertir ID a entero
+                # Try converting ID to integer
                 country_id = int(row[id_col])
-                # Obtener nombre, usar ID como placeholder si la columna de nombre no existe o está vacía
-                country_name = str(row[name_col]) if name_col in df_codes.columns and pd.notna(row[name_col]) else f"País_{country_id}"
+                # Get name, use ID as placeholder if name column doesn't exist or is empty/NaN
+                # Check explicitly for the column's existence again before accessing
+                if name_col in df_codes.columns and pd.notna(row[name_col]):
+                     country_name = str(row[name_col])
+                else:
+                     country_name = f"Country_{country_id}" # Use placeholder if name is unavailable
+
 
                 if country_id in country_codes_dict:
-                     logging.warning(f"ID de país duplicado encontrado ({country_id}). Se sobrescribirá con la última aparición en el CSV.")
+                     # Warning for duplicate ID, will overwrite with the last occurrence
+                     logging.warning(f"Duplicate country ID found ({country_id}). It will be overwritten by the last entry in the CSV.")
                 country_codes_dict[country_id] = country_name.strip()
 
             except (ValueError, TypeError) as conv_err:
-                logging.warning(f"Error al procesar fila {index+1}: ID '{row[id_col]}' o Nombre '{row.get(name_col, 'N/A')}'. Saltando fila. Error: {conv_err}")
-                continue # Saltar esta fila si la conversión falla
+                # Warning for error processing a row, skip this row
+                logging.warning(f"Error processing row {index+1}: ID '{row[id_col]}' or Name '{row.get(name_col, 'N/A')}'. Skipping row. Error: {conv_err}")
+                continue # Skip this row if conversion fails
 
         if country_codes_dict:
-            logging.info(f"Se cargaron exitosamente {len(country_codes_dict)} códigos de país desde {filepath}.")
+            logging.info(f"Successfully loaded {len(country_codes_dict)} country codes from {filepath}.")
         else:
-             logging.warning(f"No se cargaron códigos válidos desde {filepath}.")
+             logging.warning(f"No valid codes were loaded from {filepath}.")
 
     except pd.errors.EmptyDataError:
-        logging.error(f"El archivo CSV {filepath} está vacío.")
+        logging.error(f"The CSV file {filepath} is empty.")
     except Exception as e:
-        logging.error(f"Error inesperado al leer o procesar el archivo CSV {filepath}: {e}")
-        # Devolver diccionario vacío en caso de error grave
+        logging.error(f"Unexpected error while reading or processing the CSV file {filepath}: {e}")
+        # Return empty dictionary in case of serious error
         return {}
 
     return country_codes_dict
 
-# --- Ejemplo de uso (se quitaría o movería a tests o main.py) ---
+# --- Example usage (should be removed or moved to tests or main.py) ---
 # if __name__ == "__main__":
-#     # Asegúrate de que el directorio 'data' y el archivo 'codigos.csv' existan para probar
-#     test_file_path = '../data/codigos.csv' # Ajusta la ruta si ejecutas utils.py directamente
+#     # Make sure 'data' directory and 'codigos.csv' exist for testing
+#     test_file_path = '../data/codigos.csv' # Adjust path if running utils.py directly
 #
-#     # Crear directorio y archivo dummy si no existen para prueba
+#     # Create dummy directory and file if they don't exist for testing
 #     if not os.path.exists(os.path.dirname(test_file_path)):
 #         os.makedirs(os.path.dirname(test_file_path))
 #     if not os.path.exists(test_file_path):
+#         # Assuming 'NombrePais' is the actual column name in the CSV for names
 #         dummy_df = pd.DataFrame({'ID': [572, 1566, 9999], 'NombrePais': ['Afghanistan', 'Chile', 'TestCountry']})
-#         dummy_df.to_csv(test_file_path, index=False)
-#         print(f"Archivo dummy creado en {test_file_path}")
+#         dummy_df.to_csv(test_file_path, index=False, sep=';') # Use semicolon for consistency
+#         print(f"Dummy file created at {test_file_path}")
 #
-#     codes = get_country_codes_dict_from_csv(test_file_path)
+#     # Pass the correct name_col parameter if it's 'NombrePais' in the CSV
+#     codes = get_country_codes_dict_from_csv(test_file_path, name_col='NombrePais')
 #     if codes:
-#         print("Códigos cargados:")
+#         print("Codes loaded:")
 #         print(codes)
 #     else:
-#         print("No se pudieron cargar los códigos.")
+#         print("Could not load codes.")
