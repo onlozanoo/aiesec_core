@@ -1,76 +1,78 @@
 # AIESEC Core Dashboard Scraper
 
-## Objetivo
+## Objective
 
-Este proyecto tiene como objetivo extraer datos de rendimiento de los Comités Locales (LCs) de AIESEC desde el Dashboard Nacional de AIESEC en Egipto (`https://core.aiesec.org.eg/`). Los datos extraídos se estructuran para su posterior análisis y visualización.
+This project aims to extract performance data for AIESEC Local Committees (LCs) from the AIESEC Egypt National Dashboard (`https://core.aiesec.org.eg/`). The extracted data is structured for subsequent analysis and visualization.
 
-## Estructura del Proyecto
+## Project Structure
 
 ```
 aiesec_scraper/
-├── data/               # Almacena datos de entrada (codigos.csv) y salida (aiesec_lc_data.csv)
-├── logs/               # Archivos de registro (si se configuran)
-├── src/                # Código fuente
+├── data/               # Stores input (codigos.csv) and output (aiesec_lc_data_output.csv) data
+├── logs/               # Log files (if configured)
+├── src/                # Source code
 │   ├── __init__.py
-│   ├── scraper.py      # Clase principal del scraper (peticiones HTTP, orquestación)
-│   ├── parser.py       # Funciones para parsear HTML (BeautifulSoup) y extraer datos
-│   ├── utils.py        # Funciones auxiliares (leer CSV, guardar datos, etc.)
-│   └── config.py       # Configuraciones y constantes (Aún no creado)
-├── tests/              # Pruebas
-│   └── test_scraper_functional.py # Prueba funcional básica
-├── .env                # Variables de entorno (Opcional)
-├── requirements.txt    # Dependencias del proyecto
-├── README.md           # Este archivo
-└── main.py             # Punto de entrada del programa (Aún no creado)
-
+│   ├── config.py       # Configurations and constants
+│   ├── parser.py       # HTML parsing and data extraction logic
+│   ├── processing.py   # Data cleaning and standardization functions (Planned)
+│   ├── scraper.py      # Main scraper class (HTTP requests, orchestration)
+│   └── utils.py        # Utility functions (reading CSV, saving data, etc.)
+├── tests/              # Tests
+│   └── test_scraper_functional.py # Basic functional test
+├── .env                # Environment variables (Optional)
+├── requirements.txt    # Project dependencies
+├── README.md           # This file
+└── main.py             # Program entry point
 ```
 
-## Configuración
+## Setup
 
-1.  **Clonar el repositorio:**
+1.  **Clone the repository:**
     ```bash
-    git clone <url-del-repositorio>
+    git clone <repository-url>
     cd aiesec_scraper
     ```
-2.  **Crear un entorno virtual:** (Recomendado)
+2.  **Create a virtual environment:** (Recommended)
     ```bash
     python -m venv venv
-    # Activar el entorno virtual
+    # Activate the virtual environment
     # Windows
     venv\Scripts\activate
     # macOS/Linux
     source venv/bin/activate
     ```
-3.  **Instalar dependencias:**
+3.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt
     ```
-4.  **Preparar archivo de códigos:**
-    *   Crea un archivo llamado `codigos.csv` dentro de la carpeta `data/`.
-    *   Este archivo debe contener al menos las columnas `ID` (con el ID numérico del país) y `NombrePais` (con el nombre del país). Ejemplo:
+4.  **Prepare the country codes file:**
+    *   Create a file named `codigos.csv` inside the `data/` directory.
+    *   This file must contain at least the columns `Country_ID` (with the numeric country ID) and `Country_Name` (with the country name), matching the defaults in `src/config.py`. Example using comma as separator:
         ```csv
-        ID,NombrePais
+        Country_ID,Country_Name
         572,Afghanistan
         1566,Chile
         ...
         ```
+    *   *Note: Ensure the separator used in your CSV matches the one expected by `pd.read_csv` in `src/utils.py` (currently comma).* 
 
-## Uso
+## Usage
 
-1.  **Ejecutar el Scraper:** (Una vez que `main.py` esté implementado)
+1.  **Run the Scraper:**
     ```bash
     python main.py
     ```
-    Los datos extraídos se guardarán (de forma incremental) en `data/aiesec_lc_data.csv`.
+    The extracted and processed data will be saved to `data/aiesec_lc_data_output.csv` (using a semicolon separator by default, as defined in `src/config.py`).
 
-2.  **Ejecutar Prueba Funcional:** Para verificar que el scraper puede realizar peticiones y el bucle funciona (sin parseo real aún):
+2.  **Run Functional Test:** To verify that the scraper can make requests and the main loop works (even without real data parsing implemented yet):
     ```bash
     python tests/test_scraper_functional.py
     ```
 
-## Componentes Principales (`src/`)
+## Main Components (`src/`)
 
-*   **`scraper.py`**: Contiene la clase `AIESECScraper` que maneja la sesión de `requests`, realiza las peticiones a las URLs de cada país y llama al parser.
-*   **`parser.py`**: Contiene la función `parse_lc_data` que utiliza `BeautifulSoup` para analizar el HTML de cada página de país y extraer la información relevante de los LCs. **(Nota: La lógica de extracción específica aún necesita ser implementada)**.
-*   **`utils.py`**: Contiene funciones de utilidad como `get_country_codes_dict_from_csv` para leer los códigos de país del CSV y `save_data` (a implementar) para guardar los resultados.
-*   **`config.py`**: (Pendiente) Centralizará constantes como URLs base, cabeceras, rutas de archivos, etc.
+*   **`config.py`**: Centralizes configuration settings like base URLs, file paths, column names, headers, delays, and logging settings.
+*   **`scraper.py`**: Contains the `AIESECScraper` class, which manages the `requests` session, fetches country pages, and orchestrates the process by calling the parser.
+*   **`parser.py`**: Contains the `parse_lc_data` function using `BeautifulSoup` to analyze the HTML of each country page and extract relevant LC information into a pandas DataFrame. **(Note: Specific extraction logic still needs implementation based on HTML structure).**
+*   **`utils.py`**: Includes utility functions like `get_country_codes_dict_from_csv` for reading the country codes CSV.
+*   **`processing.py`**: (Planned) Intended to house functions for cleaning, standardizing, and transforming the final combined DataFrame obtained from the scraper (e.g., `process_data`).
