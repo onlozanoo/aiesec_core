@@ -16,10 +16,11 @@ if src_path not in sys.path:
 try:
     from utils import get_country_codes_dict_from_csv #, save_data (Implement save_data later)
     from scraper import AIESECScraper
-    from processing import process_data
+    from processing import process_data, process_conversion_rates
     from config import (
         COUNTRY_CODES_CSV_PATH,
         OUTPUT_CSV_PATH,
+        OUTPUT_CSV_PATH_CONVERSION_RATES,
         LOG_LEVEL,
         LOG_FILE_PATH,
         LOG_DIR,
@@ -119,6 +120,8 @@ def run_main_scraper(codes_csv_path: str, output_csv_path: str):
                 os.makedirs(output_dir)
             # Save the entire result at the end. Consider chunking for very large files.
             cleaned_df.to_csv(output_csv_path, index=False, encoding='utf-8', sep=';') # Using semicolon separator
+            #conversion_rates_df = process_conversion_rates(cleaned_df)
+            #conversion_rates_df.to_csv(OUTPUT_CSV_PATH_CONVERSION_RATES, index=False, encoding='utf-8', sep=';') # Using semicolon separator
             logging.info(f"Successfully saved data to {output_csv_path}")
             # Or call a function like: save_data(cleaned_df, output_csv_path)
         except Exception as e:

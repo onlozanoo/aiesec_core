@@ -2,7 +2,7 @@
 
 ## Objective
 
-This project aims to extract performance data for AIESEC Local Committees (LCs) from the AIESEC Egypt National Dashboard (`https://core.aiesec.org.eg/`). The extracted data is structured for subsequent analysis and visualization.
+This project aims to extract performance data for AIESEC Local Committees (LCs) from the AIESEC Egypt National Dashboard (`https://core.aiesec.org.eg/`). The extracted data is structured, processed, and saved for subsequent analysis and visualization.
 
 ## Project Structure
 
@@ -14,9 +14,9 @@ aiesec_scraper/
 │   ├── __init__.py
 │   ├── config.py       # Configurations and constants
 │   ├── parser.py       # HTML parsing and data extraction logic
-│   ├── processing.py   # Data cleaning and standardization functions (Planned)
+│   ├── processing.py   # Data cleaning, standardization, and grouping functions
 │   ├── scraper.py      # Main scraper class (HTTP requests, orchestration)
-│   └── utils.py        # Utility functions (reading CSV, saving data, etc.)
+│   └── utils.py        # Utility functions (reading CSV, etc.)
 ├── tests/              # Tests
 │   └── test_scraper_functional.py # Basic functional test
 ├── .env                # Environment variables (Optional)
@@ -46,15 +46,16 @@ aiesec_scraper/
     pip install -r requirements.txt
     ```
 4.  **Prepare the country codes file:**
-    *   Create a file named `codigos.csv` inside the `data/` directory.
-    *   This file must contain at least the columns `Country_ID` (with the numeric country ID) and `Country_Name` (with the country name), matching the defaults in `src/config.py`. Example using comma as separator:
+    *   Create a file named `codigos.csv` inside the `data/` directory (or modify the filename in `src/config.py`).
+    *   Ensure this file contains the columns defined in `src/config.py` (`COUNTRY_ID_COLUMN` and `COUNTRY_NAME_COLUMN`, currently 'Country_ID' and 'Country_Name').
+    *   Example using comma separator:
         ```csv
         Country_ID,Country_Name
         572,Afghanistan
         1566,Chile
         ...
         ```
-    *   *Note: Ensure the separator used in your CSV matches the one expected by `pd.read_csv` in `src/utils.py` (currently comma).* 
+    *   *Note: Ensure the separator used in your CSV matches the one expected by `pd.read_csv` in `src/utils.py`.* 
 
 ## Usage
 
@@ -62,17 +63,20 @@ aiesec_scraper/
     ```bash
     python main.py
     ```
-    The extracted and processed data will be saved to `data/aiesec_lc_data_output.csv` (using a semicolon separator by default, as defined in `src/config.py`).
+    *   The script reads country codes from `data/codigos.csv`.
+    *   It scrapes the data for each country, parsing the HTML tables.
+    *   The combined raw data is potentially processed/cleaned by functions in `src/processing.py`.
+    *   The final DataFrame is saved to `data/aiesec_lc_data_output.csv` (default path and separator defined in `src/config.py`).
 
-2.  **Run Functional Test:** To verify that the scraper can make requests and the main loop works (even without real data parsing implemented yet):
+2.  **Run Functional Test:** To verify basic scraper operation (requests, looping):
     ```bash
     python tests/test_scraper_functional.py
     ```
 
 ## Main Components (`src/`)
 
-*   **`config.py`**: Centralizes configuration settings like base URLs, file paths, column names, headers, delays, and logging settings.
-*   **`scraper.py`**: Contains the `AIESECScraper` class, which manages the `requests` session, fetches country pages, and orchestrates the process by calling the parser.
-*   **`parser.py`**: Contains the `parse_lc_data` function using `BeautifulSoup` to analyze the HTML of each country page and extract relevant LC information into a pandas DataFrame. **(Note: Specific extraction logic still needs implementation based on HTML structure).**
-*   **`utils.py`**: Includes utility functions like `get_country_codes_dict_from_csv` for reading the country codes CSV.
-*   **`processing.py`**: (Planned) Intended to house functions for cleaning, standardizing, and transforming the final combined DataFrame obtained from the scraper (e.g., `process_data`).
+*   **`config.py`**: Centralizes configuration settings (URLs, file paths, column names, delays, logging, etc.).
+*   **`scraper.py`**: Defines the `AIESECScraper` class responsible for managing the web scraping session, fetching pages, and coordinating the overall scraping workflow by calling the parser.
+*   **`parser.py`**: Implements the `parse_lc_data` function. It uses `BeautifulSoup` to parse the HTML content of a country page and extracts data (currently targeting tables with specific IDs/structures) into a pandas DataFrame.
+*   **`utils.py`**: Contains utility functions, primarily `get_country_codes_dict_from_csv` for reading the input country codes.
+*   **`processing.py`**: Contains functions for post-scraping data manipulation, such as `process_data` for cleaning and `group_data_by_program` for grouping the final DataFrame by AIESEC program.
