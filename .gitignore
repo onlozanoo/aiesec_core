@@ -3,3 +3,4 @@ data/
 tests/
 venv_scraper_coops/
 results.csv
+dashboard/dashboard_principal.pbix
