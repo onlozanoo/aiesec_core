@@ -34,7 +34,7 @@ LOG_FILE_PATH = os.path.join(LOG_DIR, LOG_FILENAME)
 # Column names expected in the COUNTRY_CODES_CSV_PATH file
 COUNTRY_ID_COLUMN = 'Country_ID'
 COUNTRY_NAME_COLUMN = 'Country_Name'
-
+COUNTRY_REGION_COLUMN = 'Country_Region'
 # --- Logging Configuration ---
 LOG_LEVEL = logging.INFO # Default logging level (e.g., INFO, DEBUG)
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(module)s - %(message)s'

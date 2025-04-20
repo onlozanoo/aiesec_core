@@ -19,11 +19,11 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # Drop the rows where the first column is empty or have the following values:
     # [Closed], Closed, (Closed)
-    df = df[~df.iloc[:, 0].isin(['[Closed]', 'Closed', '(Closed)', 'closed', 'CLOSED', '(Closed Expansion)'])]
+    df = df[~df.iloc[:, 2].isin(['[Closed]', 'Closed', '(Closed)', 'closed', 'CLOSED', '(Closed Expansion)', '-', '.'])]
 
     # Create the columns names by status process: "Common", "Sign up", "Applicant", "Accepted" "Approved", "Realized", "Completed"
     # and by program: "OGV", "OGTa", "OGTe", "IGTa", "IGTe", "IGV"
-    common_cols = ['Country_Name', "LC_name"]
+    common_cols = ['Country_Name', 'Country_Region', "LC_name"]
     signup_cols = ["Total Signups", "Signups OGV", "Signups OGTa", "Signups OGTe"]
     applicant_cols = ["Total Applicants", "Applicants IGV", "Applicants IGTa", "Applicants IGTe", "Applicants OGV", "Applicants OGTa", "Applicants OGTe"]
     accepted_cols = ["Total Accepted", "Accepted IGV", "Accepted IGTa", "Accepted IGTe", "Accepted OGV", "Accepted OGTa", "Accepted OGTe"]
@@ -42,7 +42,7 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     print(df.head())
     
     # For all the columns but the two first ones, convert to int
-    df.iloc[:, 2:] = df.iloc[:, 2:].applymap(int)
+    df.iloc[:, 3:] = df.iloc[:, 3:].applymap(int)
     
     # Group by program
     
@@ -56,7 +56,7 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
         if program.startswith('I'):
             df[f'Signups {program}'] = 0
             
-        program_df = df[['Country_Name', 'LC_name',
+        program_df = df[['Country_Name', 'Country_Region', 'LC_name',
                         f'Signups {program}',
                         f'Applicants {program}', 
                         f'Accepted {program}',
@@ -66,7 +66,7 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
                         f'Completed {program}']]
         
         # Rename columns to remove program prefix
-        program_df.columns = ['Country_Name', 'LC_name', 
+        program_df.columns = ['Country_Name', 'Country_Region', 'LC_name',
                             'Signups', 'Applicants', 'Accepted',
                             'Approved', 'Realized', 'Finished', 'Completed']
         
@@ -79,7 +79,7 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
     df = pd.concat(program_dfs, ignore_index=True)
     
     # Group by country, LC and program to ensure one row per LC per program
-    df = df.groupby(['Country_Name', 'LC_name', 'Program']).agg({
+    df = df.groupby(['Country_Name', 'Country_Region', 'LC_name', 'Program']).agg({
         'Signups': 'sum',
         'Applicants': 'sum', 
         'Accepted': 'sum',
@@ -88,47 +88,8 @@ def process_data(df: pd.DataFrame) -> pd.DataFrame:
         'Finished': 'sum',
         'Completed': 'sum'
     }).reset_index()
+    
+    # Add a timestamp column with the current date but not the time
+    df['Date'] = pd.Timestamp.now().strftime('%Y-%m-%d')
 
     return df
-
-
-
-
-def process_conversion_rates(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Process the conversion rates in the DataFrame.
-    """
-    # Create a new DataFrame with the conversion rates
-    conversion_rates_df = pd.DataFrame(columns=['Country_Name', 'LC_name', 'Program', 'Conversion_Rate'])
-    
-    # Calculate conversion rates for each lc (row) and process 
-    
-    # (signups, applicants, accepted, approved, realized, finished, completed) -> applicants/signups, accepted/applicants, approved/accepted, realized/approved, finished/realized, completed/finished
-   
-    # Create a new DataFrame with the conversion rates
-    conversion_rates_df = pd.DataFrame(columns=['Country_Name', 'LC_name', 'Program', 'CR AP/SU', 'CR AC/AP', 'CR APD/AC', 'CR RE/APD', 'CR FI/RE', 'CR CO/FI'])
-    
-    # Calculate conversion rates for each lc (row) and process 
-    # On error, CR = 0
-    # Each CR is calculted as a percentage an in a separate code line
-    for index, row in df.iterrows():
-        try:
-            conversion_rates_df.loc[index] = [
-                row['Country_Name'],
-                row['LC_name'], 
-                row['Program'],
-                (int(row['Applicants']) / int(row['Signups'])) * 100 if int(row['Signups']) > 0 else 0,
-                (int(row['Accepted']) / int(row['Applicants'])) * 100 if int(row['Applicants']) > 0 else 0,
-                (int(row['Approved']) / int(row['Accepted'])) * 100 if int(row['Accepted']) > 0 else 0,
-                (int(row['Realized']) / int(row['Approved'])) * 100 if int(row['Approved']) > 0 else 0,
-                (int(row['Finished']) / int(row['Realized'])) * 100 if int(row['Realized']) > 0 else 0,
-                (int(row['Completed']) / int(row['Finished'])) * 100 if int(row['Finished']) > 0 else 0
-            ]
-        except Exception as e:
-            logging.error(f"Error calculating conversion rates for row {index}: {e}")
-            conversion_rates_df.loc[index] = [row['Country_Name'], row['LC_name'], row['Program'], 0, 0, 0, 0, 0, 0]
-    
-    
-    return conversion_rates_df
-
-

@@ -16,17 +16,17 @@ if src_path not in sys.path:
 try:
     from utils import get_country_codes_dict_from_csv #, save_data (Implement save_data later)
     from scraper import AIESECScraper
-    from processing import process_data, process_conversion_rates
+    from processing import process_data
     from config import (
         COUNTRY_CODES_CSV_PATH,
         OUTPUT_CSV_PATH,
-        OUTPUT_CSV_PATH_CONVERSION_RATES,
         LOG_LEVEL,
         LOG_FILE_PATH,
         LOG_DIR,
         LOG_FORMAT,
         COUNTRY_ID_COLUMN,
         COUNTRY_NAME_COLUMN,
+        COUNTRY_REGION_COLUMN,
         OUTPUT_SEPARATOR,
         OUTPUT_ENCODING
     )
@@ -62,7 +62,7 @@ def setup_logging():
         root_logger.addHandler(file_handler)
         logging.info(f"Logging to console and file: {LOG_FILE}")
     except Exception as e:
-        logging.error(f"Failed to set up file logging to {LOG_FILE}: {e}")
+        logging.error(f"Failed to set up file logging to {LOG_FILE}: {e}")  
         logging.info("Logging to console only.")
 
 # --- Main Execution Function ---
@@ -73,7 +73,7 @@ def run_main_scraper(codes_csv_path: str, output_csv_path: str):
     # 1. Load Country Codes
     logging.info(f"Loading country codes from: {codes_csv_path}")
     # Make sure column names match your CSV and the function's defaults/parameters
-    country_codes = get_country_codes_dict_from_csv(codes_csv_path, id_col='Country_ID', name_col='Country_Name')
+    country_codes, region_map = get_country_codes_dict_from_csv(codes_csv_path, id_col='Country_ID', name_col='Country_Name', region_col='Country_Region')
 
     if not country_codes:
         logging.error("Failed to load country codes. Exiting.")
@@ -86,7 +86,7 @@ def run_main_scraper(codes_csv_path: str, output_csv_path: str):
     try:
         logging.info("Starting the scraping process...")
         # run_scraper now returns a DataFrame
-        raw_data_df = scraper.run_scraper(country_codes)
+        raw_data_df = scraper.run_scraper(country_codes, region_map)
         logging.info(f"Scraping finished. Received DataFrame with {len(raw_data_df)} rows.")
 
     except Exception as e:
@@ -120,8 +120,6 @@ def run_main_scraper(codes_csv_path: str, output_csv_path: str):
                 os.makedirs(output_dir)
             # Save the entire result at the end. Consider chunking for very large files.
             cleaned_df.to_csv(output_csv_path, index=False, encoding='utf-8', sep=';') # Using semicolon separator
-            #conversion_rates_df = process_conversion_rates(cleaned_df)
-            #conversion_rates_df.to_csv(OUTPUT_CSV_PATH_CONVERSION_RATES, index=False, encoding='utf-8', sep=';') # Using semicolon separator
             logging.info(f"Successfully saved data to {output_csv_path}")
             # Or call a function like: save_data(cleaned_df, output_csv_path)
         except Exception as e:

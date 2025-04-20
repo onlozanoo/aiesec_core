@@ -6,7 +6,7 @@ from typing import List, Dict, Optional
 # Basic logging configuration (can be moved to config.py or initialized in main.py)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def parse_lc_data(html_content: str, country_id: int, country_name: str) -> List[Dict]:
+def parse_lc_data(html_content: str, country_id: int, country_name: str, country_region: str) -> List[Dict]:
     """
     Parses the HTML content of a country's analysis page to extract LC data.
 
@@ -73,6 +73,7 @@ def parse_lc_data(html_content: str, country_id: int, country_name: str) -> List
         
         # añadir columna con el nombre del pais al principio
         df.insert(0, 'Country_Name', country_name)
+        df.insert(1, 'Country_Region', country_region)
         
         #logging.info(df)
 

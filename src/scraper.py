@@ -65,7 +65,7 @@ class AIESECScraper:
             logging.error(f"Unexpected error during request for Country ID {country_id}: {e}")
             return None
 
-    def run_scraper(self, country_codes_dict: Dict[int, str]) -> pd.DataFrame:
+    def run_scraper(self, country_codes_dict: Dict[int, str], country_region_dict: Dict[int, str]) -> pd.DataFrame:
         """
         Orchestrates the entire scraping process for the given list of countries.
 
@@ -86,7 +86,7 @@ class AIESECScraper:
         logging.info(f"Starting scraping for {total_countries} countries...")
 
         for i, (country_id, country_name) in enumerate(country_codes_dict.items()):
-            logging.info(f"Processing Country {i+1}/{total_countries}: ID={country_id}, Name='{country_name}'")
+            logging.info(f"Processing Country {i+1}/{total_countries}: ID={country_id}, Name='{country_name}', Region='{country_region_dict[country_id]}'")
 
             # 1. Fetch HTML
             html_content = self.fetch_country_page(country_id)
@@ -96,7 +96,7 @@ class AIESECScraper:
                 try:
                     # --- ACTUAL CALL TO THE PARSING FUNCTION ---
                     # Expecting a DataFrame from parse_lc_data now
-                    parsed_df = parse_lc_data(html_content, country_id, country_name)
+                    parsed_df = parse_lc_data(html_content, country_id, country_name, country_region_dict[country_id])
                     # --- END OF CALL ---
 
                     # Check if the parser returned a valid, non-empty DataFrame

@@ -25,6 +25,30 @@ aiesec_scraper/
 └── main.py             # Program entry point
 ```
 
+## AIESEC Regions
+
+*(Please add the list of AIESEC operational regions here)*
+
+*   Americas
+*   Europe
+*   Asia Pacific
+*   MEA (Middle East & Africa)
+
+## Roadmap
+
+- [x] **Project Setup**: Define structure, dependencies (`requirements.txt`), basic README.
+- [x] **Configuration**: Centralize settings in `src/config.py`.
+- [x] **Utilities (`src/utils.py`)**: Implement function to read country codes from CSV.
+- [x] **Scraper Core (`src/scraper.py`)**: Implement `AIESECScraper` class for handling requests session, fetching pages per country ID, and orchestrating the scraping loop.
+- [x] **HTML Parser (`src/parser.py`)**: Implement `parse_lc_data` using BeautifulSoup to extract data from HTML tables into a DataFrame.
+- [x] **Main Script (`main.py`)**: Create entry point, handle imports, orchestrate workflow (load codes -> scrape -> process -> save).
+- [x] **Data Processing (`src/processing.py`)**: Implement basic data processing structure and program grouping function (`group_data_by_program`).
+- [ ] **Data Cleaning & Standardization**: Enhance `src/processing.py` with robust cleaning logic (type conversion, handling missing values, column renaming/selection).
+- [ ] **Saving Results**: Implement a robust saving function (potentially in `utils.py` or `main.py`) for the final DataFrame.
+- [ ] **Dashboard / Visualization**: Develop dashboards or visualizations based on the cleaned data.
+- [ ] **Error Handling & Logging**: Enhance error handling and logging throughout the application.
+- [ ] **Unit/Integration Tests**: Add more comprehensive tests for parser, processing, and scraper logic.
+
 ## Setup
 
 1.  **Clone the repository:**

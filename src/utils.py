@@ -10,7 +10,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def get_country_codes_dict_from_csv(
     filepath: str,
     id_col: str = 'Country_ID',
-    name_col: str = 'Country_Name'
+    name_col: str = 'Country_Name',
+    region_col: str = 'Country_Region'
 ) -> Dict[int, str]:
     """
     Reads country IDs and names from a CSV file and returns them as a dictionary.
@@ -26,7 +27,8 @@ def get_country_codes_dict_from_csv(
     """
     logging.info(f"Attempting to read country codes from: {filepath}")
     country_codes_dict: Dict[int, str] = {}
-
+    country_region_dict: Dict[int, str] = {}
+    
     try:
         # 1. Check if the file exists
         if not os.path.exists(filepath):
@@ -69,20 +71,36 @@ def get_country_codes_dict_from_csv(
                 # Warning for error processing a row, skip this row
                 logging.warning(f"Error processing row {index+1}: ID '{row[id_col]}' or Name '{row.get(name_col, 'N/A')}'. Skipping row. Error: {conv_err}")
                 continue # Skip this row if conversion fails
+        
+        # 5. Create the dictionary {ID: CountryRegion}
+        for index, row in df_codes.iterrows():
+            try:
+                country_id = int(row[id_col])
+                country_region = str(row[region_col])
+                country_region_dict[country_id] = country_region.strip()
+            except (ValueError, TypeError) as conv_err:
+                # Warning for error processing a row, skip this row
+                logging.warning(f"Error processing row {index+1}: ID '{row[id_col]}' or Region '{row.get(region_col, 'N/A')}'. Skipping row. Error: {conv_err}")
+                continue # Skip this row if conversion fails
 
         if country_codes_dict:
             logging.info(f"Successfully loaded {len(country_codes_dict)} country codes from {filepath}.")
         else:
              logging.warning(f"No valid codes were loaded from {filepath}.")
+        
+        if country_region_dict:
+            logging.info(f"Successfully loaded {len(country_region_dict)} country regions from {filepath}.")
+        else:
+            logging.warning(f"No valid regions were loaded from {filepath}.")
 
     except pd.errors.EmptyDataError:
         logging.error(f"The CSV file {filepath} is empty.")
     except Exception as e:
         logging.error(f"Unexpected error while reading or processing the CSV file {filepath}: {e}")
         # Return empty dictionary in case of serious error
-        return {}
+        return {}, {}
 
-    return country_codes_dict
+    return country_codes_dict, country_region_dict
 
 # --- Example usage (should be removed or moved to tests or main.py) ---
 # if __name__ == "__main__":
