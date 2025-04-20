@@ -44,7 +44,9 @@ aiesec_scraper/
 - [x] **ETL Workflow (`etl/extract_lcs.py`)**: Define main `extract_all_data` function orchestrating load -> scrape -> process.
 - [x] **Data Processing (`etl/processing.py`)**: Implement basic data processing structure and program grouping function (`group_data_by_program`).
 - [x] **Main Trigger Script (`update_data.py`)**: Create entry point to run ETL, save results as Parquet (timestamped & latest), optionally open Power BI.
+- [ ] **Progess Bar**: Create a simple GUI progress bar that allows to see how the scraping process advance. 
 - [ ] **Data Cleaning & Standardization**: Enhance `etl/processing.py` with robust cleaning logic (type conversion, handling missing values, column renaming/selection).
+- [ ] **GUI**: Creation of a GUI that allows to personalize the update of the countries.
 - [ ] **Saving Results**: Refine saving logic if needed (currently in `update_data.py`).
 - [ ] **Dashboard / Visualization**: Develop Power BI dashboard (`dashboard/dashboard_principal.pbix`) connecting to `data/data_latest.parquet`.
 - [ ] **Error Handling & Logging**: Enhance error handling and logging throughout the application.
@@ -69,7 +71,6 @@ aiesec_scraper/
 3.  **Install dependencies:**
     ```bash
     pip install -r requirements.txt 
-    # (This now includes pyarrow for Parquet support)
     ```
 4.  **Prepare the country codes file:**
     *   Create a file named `codigos.csv` inside the `data/` directory (or modify the filename in `etl/config.py`).

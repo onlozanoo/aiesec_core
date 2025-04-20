@@ -3,9 +3,11 @@ import logging
 import time
 from typing import Dict, Optional, List
 import pandas as pd # Import pandas
+# from tqdm import tqdm # Keep console tqdm as fallback if needed
+from tqdm.tk import tqdm as tqdm_tk # Import tqdm GUI version
 
 # --- Import parsing function ---
-from parser import parse_lc_data # Make sure parser.py is in src/
+from .parser import parse_lc_data # Relative import
 
 # Assuming config.py will exist in the same directory (src)
 # from .config import BASE_URL, DEFAULT_VIEW_SUFFIX, HEADERS, REQUEST_DELAY_SECONDS
@@ -85,8 +87,15 @@ class AIESECScraper:
         total_countries = len(country_codes_dict)
         logging.info(f"Starting scraping for {total_countries} countries...")
 
-        for i, (country_id, country_name) in enumerate(country_codes_dict.items()):
-            logging.info(f"Processing Country {i+1}/{total_countries}: ID={country_id}, Name='{country_name}', Region='{country_region_dict[country_id]}'")
+        # Wrap the iterator with tqdm for a GUI progress bar window
+        progress_bar = tqdm_tk(country_codes_dict.items(), total=total_countries, desc="Scraping Countries", unit="country")
+
+        for i, (country_id, country_name) in enumerate(progress_bar):
+            # Optional: Update progress bar description with current country
+            progress_bar.set_description(f"Scraping {country_name[:15]:<15}") # Pad name for consistent width
+
+            # Log progress using English identifiers (INFO level might interfere less with tqdm)
+            # logging.info(f"Processing Country {i+1}/{total_countries}: ID={country_id}, Name='{country_name}', Region='{country_region_dict[country_id]}'")
 
             # 1. Fetch HTML
             html_content = self.fetch_country_page(country_id)
