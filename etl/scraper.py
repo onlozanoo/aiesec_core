@@ -29,8 +29,23 @@ class AIESECScraper:
         and loading necessary configurations.
         """
         self.session = requests.Session()
-        # Load configuration directly (or from config.py)
-        from config import BASE_URL, DEFAULT_VIEW_SUFFIX, REQUEST_DELAY_SECONDS, HEADERS
+        # Load configuration settings. We prefer a relative import so that the
+        # module works when executed as part of the package, but we also fall
+        # back to an absolute import when run directly.
+        try:
+            from .config import (
+                BASE_URL,
+                DEFAULT_VIEW_SUFFIX,
+                REQUEST_DELAY_SECONDS,
+                HEADERS,
+            )
+        except ImportError:  # pragma: no cover - fallback for direct execution
+            from config import (
+                BASE_URL,
+                DEFAULT_VIEW_SUFFIX,
+                REQUEST_DELAY_SECONDS,
+                HEADERS,
+            )
         self.base_url = BASE_URL
         self.view_suffix = DEFAULT_VIEW_SUFFIX
         self.delay = REQUEST_DELAY_SECONDS
