@@ -2,7 +2,16 @@ import pandas as pd
 import logging
 import os
 from typing import Dict, Optional # For type hints
-from config import COUNTRY_ID_COLUMN, COUNTRY_NAME_COLUMN
+# Use a relative import here so this module works whether the package is loaded
+# via its package name or executed directly. Importing "config" absolutely can
+# fail when the caller does not manipulate ``sys.path`` in the same way as the
+# development environment.
+# Prefer a relative import when used as part of the package but provide a
+# fallback to support running this module directly.
+try:
+    from .config import COUNTRY_ID_COLUMN, COUNTRY_NAME_COLUMN
+except ImportError:  # pragma: no cover - direct execution fallback
+    from config import COUNTRY_ID_COLUMN, COUNTRY_NAME_COLUMN
 
 # Basic logging configuration (can be moved to config.py or main.py for centralization)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
