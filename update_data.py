@@ -67,34 +67,35 @@ if __name__ == "__main__":
     if isinstance(final_df, pd.DataFrame) and not final_df.empty:
         logging.info(f"ETL process successful. Received {len(final_df)} rows.")
 
-        # 2. Define output paths within the DATA_DIR
-        current_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        timestamped_filename = f"data_{current_timestamp}.csv"
-        latest_filename = "data_latest.csv"
-        output_path_timestamped = os.path.join(DATA_DIR, timestamped_filename)
-        output_path_latest = os.path.join(DATA_DIR, latest_filename)
+        # 2. Add a datetime column and define output path
+        current_timestamp = datetime.now()
+        final_df['DateTime'] = current_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+
+        output_filename = "data_latest.csv"
+        output_path = os.path.join(DATA_DIR, output_filename)
 
         # Ensure data directory exists
         if not os.path.exists(DATA_DIR):
             os.makedirs(DATA_DIR)
             logging.info(f"Created data directory: {DATA_DIR}")
 
-        # 3. Save timestamped Parquet file
+        # 3. Append data to the single CSV file
         try:
-            logging.info(f"Saving timestamped data to: {output_path_timestamped}")
-            # You might need to install pyarrow: pip install pyarrow
-            final_df.to_csv(output_path_timestamped, index=False, sep=';')
-            logging.info("Timestamped file saved successfully.")
+            file_exists = os.path.exists(output_path)
+            mode = 'a' if file_exists else 'w'
+            logging.info(
+                f"Saving data to: {output_path} (append={'yes' if file_exists else 'no'})"
+            )
+            final_df.to_csv(
+                output_path,
+                index=False,
+                sep=';',
+                mode=mode,
+                header=not file_exists,
+            )
+            logging.info("Data file written successfully.")
         except Exception as e:
-            logging.error(f"Failed to save timestamped parquet file: {e}", exc_info=True)
-
-        # 4. (Optional) Save/Update the 'latest' file alias
-        try:
-            logging.info(f"Updating latest data alias: {output_path_latest}")
-            final_df.to_csv(output_path_latest, index=False, sep=';')
-            logging.info("Latest file alias updated successfully.")
-        except Exception as e:
-            logging.error(f"Failed to save/update latest parquet file: {e}", exc_info=True)
+            logging.error(f"Failed to save data file: {e}", exc_info=True)
 
     elif isinstance(final_df, pd.DataFrame) and final_df.empty:
          logging.warning("ETL process completed but returned an empty DataFrame. No file saved.")

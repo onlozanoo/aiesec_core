@@ -2,13 +2,13 @@
 
 ## Objective
 
-This project aims to extract performance data for AIESEC Local Committees (LCs) from the AIESEC Egypt National Dashboard (`https://core.aiesec.org.eg/`). The extracted data is structured, processed, and saved (as Parquet files) for subsequent analysis and visualization, potentially in Power BI.
+This project aims to extract performance data for AIESEC Local Committees (LCs) from the AIESEC Egypt National Dashboard (`https://core.aiesec.org.eg/`). The extracted data is structured, processed, and saved as CSV files for subsequent analysis and visualization, potentially in Power BI.
 
 ## Project Structure
 
 ```
 aiesec_scraper/
-├── data/               # Stores input (codigos.csv) and output (*.parquet) data
+├── data/               # Stores input (codigos.csv) and output (*.csv) data
 ├── dashboard/          # Power BI dashboard files (e.g., dashboard_principal.pbix)
 ├── etl/                # ETL (Extract, Transform, Load) source code
 │   ├── __init__.py
@@ -43,12 +43,12 @@ aiesec_scraper/
 - [x] **HTML Parser (`etl/parser.py`)**: Implement `parse_lc_data` using BeautifulSoup to extract data from HTML tables into a DataFrame.
 - [x] **ETL Workflow (`etl/extract_lcs.py`)**: Define main `extract_all_data` function orchestrating load -> scrape -> process.
 - [x] **Data Processing (`etl/processing.py`)**: Implement basic data processing structure and program grouping function (`group_data_by_program`).
-- [x] **Main Trigger Script (`update_data.py`)**: Create entry point to run ETL, save results as Parquet (timestamped & latest), optionally open Power BI.
+- [x] **Main Trigger Script (`update_data.py`)**: Create entry point to run ETL, saving results into a single CSV file that is appended on each run, and optionally open Power BI.
 - [x] **Progess Bar**: Create a simple GUI progress bar that allows to see how the scraping process advance. 
 - [ ] **Data Cleaning & Standardization**: Enhance `etl/processing.py` with robust cleaning logic (type conversion, handling missing values, column renaming/selection).
 - [ ] **GUI**: Creation of a GUI that allows to personalize the update of the countries.
 - [ ] **Saving Results**: Refine saving logic if needed (currently in `update_data.py`).
-- [ ] **Dashboard / Visualization**: Develop Power BI dashboard (`dashboard/dashboard_principal.pbix`) connecting to `data/data_latest.parquet`.
+- [ ] **Dashboard / Visualization**: Develop Power BI dashboard (`dashboard/dashboard_principal.pbix`) connecting to `data/data_latest.csv`.
 - [ ] **Error Handling & Logging**: Enhance error handling and logging throughout the application.
 - [ ] **Unit/Integration Tests**: Add more comprehensive tests for parser, processing, and scraper logic.
 
@@ -94,9 +94,7 @@ aiesec_scraper/
     python update_data.py
     ```
     *   This script orchestrates the entire process defined in `etl/extract_lcs.py`.
-    *   It saves the final DataFrame in the `data/` directory as:
-        *   `data_<YYYYMMDD_HHMMSS>.csv` (timestamped version)
-        *   `data_latest.csv` (overwritten each run)
+    *   It saves the processed DataFrame in the `data/` directory by appending it to `data_latest.csv`. A `DateTime` column is added automatically.
     *   Optionally attempts to open the Power BI file specified in the script (`dashboard/dashboard_principal.pbix`).
 
 2.  **Run Functional Test:** To verify basic scraper operation (requires adjustments for `etl` structure):
