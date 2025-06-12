@@ -95,8 +95,8 @@ aiesec_scraper/
     ```
     *   This script orchestrates the entire process defined in `etl/extract_lcs.py`.
     *   It saves the final DataFrame in the `data/` directory as:
-        *   `data_<YYYYMMDD_HHMMSS>.parquet` (timestamped version)
-        *   `data_latest.parquet` (overwritten each run)
+        *   `data_<YYYYMMDD_HHMMSS>.csv` (timestamped version)
+        *   `data_latest.csv` (overwritten each run)
     *   Optionally attempts to open the Power BI file specified in the script (`dashboard/dashboard_principal.pbix`).
 
 2.  **Run Functional Test:** To verify basic scraper operation (requires adjustments for `etl` structure):
@@ -115,8 +115,48 @@ aiesec_scraper/
 *   **`processing.py`**: Includes functions for data cleaning (`process_data`) and transformation (`group_data_by_program`).
 *   **`extract_lcs.py`**: Contains the main `extract_all_data` function that orchestrates the ETL steps (calling utils, scraper, parser, processing).
 
-## Dashboard Changelog
+## Dashboard Overview
 
-Changes made specifically to the Power BI dashboard (visuals, measures, pages, etc.) are tracked separately.
+The Power BI dashboard is the final visualization product of this project. It is built using the structured and processed data obtained through the ETL pipeline. The dashboard is designed to support Greener's IR (International Relations) efforts by offering two key views:
 
-See the `dashboard_changelog.md` file in the project root for details on dashboard updates.
+<img width="586" alt="Image" src="https://github.com/user-attachments/assets/7d0348fe-d779-42d3-936d-692ba6a06524"/>
+
+### Dashboard Sections
+
+* 1. Dashboard Países:
+ 
+<img width="598" alt="Image" src="https://github.com/user-attachments/assets/7616c04e-a011-41f0-8e80-a8a6f1a30f9e" />
+
+Aggregated view by country.
+
+Allows for comparison of performance indicators between countries.
+
+Useful for identifying top-performing countries for potential partnerships.
+
+
+
+Key elements in this view:
+
+Map visualization to show Approved EPs by country with intensity.
+
+Top 3 LCs by Approved shown in horizontal bars.
+
+Funnel Sankey Chart for program, region, and LC breakdown — helping identify contribution by level.
+
+Global filters for region, country, program, and date.
+
+* 2. Dashboard LCs:
+
+Disaggregated view by Local Committee (LC).
+
+Enables detailed tracking of funnel performance for each LC.
+
+Supports data-driven decisions when selecting IR partners.
+
+Preview
+
+https://app.powerbi.com/view?r=eyJrIjoiMjQyZmMwZTYtMDU2Mi00YzA0LTk2ZGMtNWU4MWZlMjZlMmYyIiwidCI6IjNiOTQ0ZDlhLTEwNTEtNDY4NS1iMDlkLTlhOTVlZTJkYmQ5OSIsImMiOjR9&pageName=30a7448ebaea2647b4d3&pageName=b094782ddb6122e4434f
+
+This cover represents the homepage of the dashboard where users can choose which section (Países or LCs) they want to explore.
+
+The dashboard connects dynamically to data/data_latest.csv and is updated automatically every time the ETL process is executed using update_data.py.
